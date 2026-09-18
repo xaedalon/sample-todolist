@@ -39,6 +39,13 @@ conditions:
     - hasEnvironment
     - hasWorktree
 phases:
+  # First, for the same reason the five work workflows carry it: `requires:
+  # hasWorktree` above is not enforced against the workflow about to run, and
+  # merge-integrate's first step commits everything in its workspace. Without
+  # a worktree that workspace is the project's own working copy, so an unticked
+  # worktree-create would turn this into "commit whatever is lying around on
+  # main". One file, six references.
+  - in-my-worktree
   - merge-integrate
   - environment-teardown
   - worktree-remove

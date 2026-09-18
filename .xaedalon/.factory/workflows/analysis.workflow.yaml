@@ -25,4 +25,8 @@ conditions:
 # Factory still runs at most three tasks at once by default.
 scheduling: parallel
 phases:
+  # The guard first, in every one of the five, because the scheduler's own
+  # flag check can be routed around by unticking worktree-create. One file,
+  # five references — see phases/in-my-worktree.phase.yaml.
+  - in-my-worktree
   - analysis
