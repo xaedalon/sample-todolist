@@ -1,7 +1,7 @@
 # Todolist
 
 A small todo web app, built one task at a time by coding agents under
-[Xaedalon Factory](../factory). It is deliberately ordinary: everybody knows what a todo list should
+[Xaedalon Factory](https://github.com/xaedalon/factory-community). It is deliberately ordinary: everybody knows what a todo list should
 do, which makes it easy to tell whether an agent did the job.
 
 This file is the source of truth. Each task below is one Factory task — the name is what to type

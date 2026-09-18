@@ -26,4 +26,4 @@ build.
 ## Improvements
 
 Create an `improvements.md` file where you add the improvements that you notice and you think we
-should do, so we will tackle them into a specific session. Commit and push.
+should do, so we will tackle them into a specific session.
