@@ -11,7 +11,7 @@ agent produces from it — the HTML, the stylesheets, the TypeScript, the tests 
 
 [**`PROJECT.md`**](PROJECT.md) is the source of truth: the stack, the look-and-feel contract, and ten
 tasks. Each task's name is what you type into Factory's **New task**, and its "done when" list is
-what you check at the approval gate.
+what the `verify` phase checks before the work is merged.
 
 The ten form a graph rather than a chain — tasks 3 and 4 can run at the same time, and so can 7 and
 8 — which is what makes it a useful sample: it exercises task dependencies rather than a queue, and
@@ -39,6 +39,10 @@ pick **`merge`** as each task's workflow, and press **Queue all**. One workflow 
 `merge` needs `verify`, which needs `validate`, and so on back to the worktree, so Factory assembles
 the whole chain and tells you what it added. Leave the Branch field empty; the workflows derive it.
 
+**There is no approval gate**, on purpose: every task runs from an empty worktree to a merged branch
+without stopping, so ten tasks and one **Queue all** is the whole interaction. Put it back by adding
+`approval: before` to `phases/merge-integrate.phase.yaml` if you would rather see each one first.
+
 [`docs/task-dependencies.md`](https://github.com/xaedalon/factory-community/blob/main/docs/task-dependencies.md)
 covers declaring the graph and the two whole-project buttons;
 [quickstart](https://github.com/xaedalon/factory-community/blob/main/docs/quickstart.md) covers the
@@ -53,18 +57,37 @@ Picking `merge` on a task gets all eight of these, in this order:
 | 1 | `worktree-create` | a worktree at `<worktrees root>/<task directory>`, on `task/<task directory>`, branched from the default branch |
 | 2 | `environment-create` | checks what the pipeline needs (a git identity, because step 8 commits), then installs this worktree's dependencies if it has a manifest |
 | 3–7 | `analysis` → `design` → `implement` → `validate` → `verify` | the work: one agent step each, each writing an artifact the next one reads |
-| 8 | `merge` | **a gate**, then commit the work, catch up with the default branch, fast-forward it, take the environment away, remove the worktree |
+| 8 | `merge` | commit the work, **an agent** brings the default branch in and resolves any conflict, fast-forward the default branch, take the environment away, remove the worktree |
 
 **Several tasks run at once.** That is the reason for the worktree: five agents in one working copy
 overwrite each other, five agents in five worktrees do not. The five work workflows are
 `scheduling: parallel` and Factory runs three tasks at a time by default.
 
 **The merge is the part that has to be careful**, because it is the only part touching something
-shared. It happens in two moves: the default branch is merged *into the task's branch first*, inside
-the worktree, where a conflict can be read and where failing costs nothing — and only then is the
-default branch fast-forwarded, which either applies completely or does nothing at all. The whole
-section is held under a lock (`<repo>/.git/factory-merge.lock`), so three tasks approved in the same
-second merge one after another rather than on top of each other. Measured, with three of them.
+shared, and it is an *agent* that drives it rather than a `git merge` that either works or fails. The
+order is what makes that safe:
+
+1. a shell step commits what the task produced — no judgement in it, so no agent needed;
+2. a shell step takes a lock (`<repo>/.git/factory-merge.lock`);
+3. **the agent** merges the default branch *into the task's branch*, inside the worktree, and
+   resolves whatever conflicts that turns up — it is the same conversation that wrote the code and
+   read the review (`session: task`), and it writes a `merge` artifact recording each decision;
+4. a shell step fast-forwards the default branch and releases the lock. A fast-forward either
+   applies completely or does nothing at all, so the one write to shared state is the one operation
+   with nothing to decide.
+
+The lock spans steps 2 to 4 — including the agent — and that span was bought with evidence. With the
+lock around the fast-forward alone, two tasks merging together both found the default branch where
+they had left it, both agents said "already up to date", the first landed, and the second hit a
+conflict in a merge it had already finished, with the agent long gone. It recovered, but it needed a
+person to press Retry. Holding the lock across the decision means one task integrates at a time;
+everything up to `verify` still runs in parallel, which is where the time actually goes.
+
+If any of it fails anyway, `on_fail: merge-repair` runs an agent *before* the task is blocked: it gets
+the failure reason and the task's own session, releases the lock if this task was holding it, puts the
+branch back into a state that can be landed, and writes down what it did — so the one Retry that
+follows usually just works. Measured: asked to recover from exactly the race above, it reconstructed
+the timeline, resolved the conflict keeping both sides, and left the branch fast-forwardable.
 
 **Nothing is thrown away unless it merged.** A failing phase stops its workflow, so a task that
 cannot be merged keeps its worktree, its branch and everything in it. `worktree-delete` run on its
@@ -80,8 +103,8 @@ task, when a manifest changed underneath it or when you want its dependencies ba
 | | |
 |---|---|
 | `config.yaml` | one line that matters — `scope: project` |
-| `workflows/` | the eight above, plus `environment-update` and `environment-delete` |
-| `phases/` | five agent phases, and five shell phases doing the worktree, environment and merge work |
+| `workflows/` | the eight above, plus `environment-update`, `environment-delete` and `merge-repair` |
+| `phases/` | five agent phases for the work, a sixth for repairing a failed merge, and five doing the worktree, environment and merge machinery |
 | `agents/developer.agent.yaml` | who does the work |
 | `.gitignore` | `node_modules/` and friends — the merge commits everything a task produced, so this is what keeps a dependency tree out of it |
 
@@ -89,12 +112,14 @@ The five work workflows chain with `needs:`, so `design` will not start until `a
 that task, and each phase writes an artifact the next one reads — design reads the analysis,
 implement reads the design, verify reads all three.
 
-The agent **names no provider on purpose**, so the sample runs on whichever coding agent you already
-have: Factory falls back to the configured default, then to the only one installed. Its `model:
-balanced` is a role rather than a model id, and each provider maps it to its own middle model. Pin
-either in that file if you want a particular one.
+The agent **pins `provider: copilot`, and that is one line to change** to `claude` or `codex`. It has
+to name one: Factory's documented fallback is "the configured default, then the only one installed",
+but nothing a scope can write sets that default — only the CLI's `factory run --provider` — so on a
+machine with two CLIs installed an unpinned agent step is refused at plan time, with a message saying
+exactly that. `model: balanced` is a role rather than a model id, and each provider maps it to its
+own middle model.
 
-Five of the ten workflows are **overrides**: Factory's built-in `worktree-create`, `worktree-delete`,
+Five of the twelve workflows are **overrides**: Factory's built-in `worktree-create`, `worktree-delete`,
 `environment-create`, `environment-update` and `environment-delete` all declare `override: required`,
 which is them saying that where a worktree goes and what an environment is made of are not things a
 built-in can know. The files here are that answer, and they are commented at length — they are the

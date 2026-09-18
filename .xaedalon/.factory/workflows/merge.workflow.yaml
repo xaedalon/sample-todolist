@@ -5,23 +5,33 @@
 # verify, validate, implement, design, analysis, environment-create and
 # worktree-create, in that order, and Factory tells you it did.
 #
+# There is no approval gate. The task's own `verify` phase is the check, and the
+# merge is written so that the parts which can go wrong go wrong *in the
+# worktree*, where they cost nothing and where an agent can put them right.
+#
 # The three phases are the whole point of the ordering. Nothing is cleared up
 # unless the merge succeeded, because a phase that fails stops the workflow —
 # so a task that cannot be merged keeps its worktree, its branch and everything
 # in them, which is exactly what you want to look at. The two cleanup phases
 # are the same files `environment-delete` and `worktree-delete` use; they are
 # not copies.
-# The one workflow here that is `sequential`. It writes to the default branch
-# and to the repository's own working copy — "it touches the same branch" is
-# exactly what that lane is for — so Factory runs at most one merge at a time
-# whatever else is in flight. The retry inside the phase is then a second line
-# of defence rather than the first.
+#
+# `on_fail` is the second chance: if any of this fails, Factory runs
+# `merge-repair` before the task is blocked, so an agent has been at the
+# problem — with the failure reason in hand and the task's own session — before
+# anybody opens it. One Retry then usually lands it.
 kind: factory.workflow/v1
 name: merge
 description: Merges the task's branch into the default branch, then removes its environment and worktree.
 needs:
   - verify
+# The one workflow here that is `sequential`. It writes to the default branch
+# and to the repository's own working copy — "it touches the same branch" is
+# exactly what that lane is for — so Factory runs at most one merge at a time
+# whatever else is in flight. The lock inside the phase is what actually
+# guarantees it; see the comment there.
 scheduling: sequential
+on_fail: merge-repair
 conditions:
   requires:
     - hasWorktree

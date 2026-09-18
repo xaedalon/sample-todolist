@@ -1,12 +1,17 @@
 name: developer
-description: Code implementation.
-# No provider on purpose: the sample should run on whichever coding agent you
-# already have. Factory falls back to the configured default, then to the only
-# one installed. Pin it here (`provider: claude`, `copilot` or `codex`) if you
-# have several and want a particular one.
+description: Code implementation, and the merge at the end of it.
+# Pinned, and it has to be. Factory's fallback for a step that names no
+# provider is "the configured default, then the only one installed" — but the
+# only thing that can set a default is the CLI's `factory run --provider`, so a
+# task run by the daemon has none. With two CLIs installed the step is refused
+# at plan time: "does not say which agent to use, and 2 are installed".
 #
-# `balanced` is a role rather than a model id, so each provider maps it to its
-# own middle model — Sonnet on Claude Code and Copilot, gpt-5-codex on Codex.
-# `strong` and `fast` are the other two.
+# Change this one line to `claude` or `codex` if that is what you have. The
+# merge phase was measured against Copilot resolving a real conflict.
+provider: copilot
+# A role rather than a model id, so each provider maps it to its own middle
+# model — claude-sonnet-5 here, `sonnet` on Claude Code, gpt-5-codex on Codex.
 model: balanced
+# One conversation for the whole task, so the agent that merges at the end is
+# the one that wrote the code and read the review.
 session: task
