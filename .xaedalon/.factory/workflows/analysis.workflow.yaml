@@ -1,0 +1,5 @@
+name: analysis
+description: Analyze given task.
+scheduling: sequential
+phases:
+  - analysis

@@ -1,0 +1,9 @@
+name: design
+description: Create the technical design of the solution.
+steps:
+  - prompt: >-
+      Design the technical solution for "{{ task.description }}". Read the analysis at
+      {{ task.artifacts }}/analysis/analysis.md and PROJECT.md first. Describe the approach, the
+      files you will touch and the order of the work. Do not write any code yet.
+    agent: developer
+    artifact: design

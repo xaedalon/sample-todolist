@@ -1,0 +1,11 @@
+name: verify
+description: Verify the implementation is what the task expected.
+steps:
+  - prompt: >-
+      Verify that the implementation of "{{ task.description }}" is what the task actually asked
+      for. Compare it against {{ task.artifacts }}/analysis/analysis.md, the design at
+      {{ task.artifacts }}/design/design.md and the test results at
+      {{ task.artifacts }}/validate/validate.md. Say plainly whether it meets the task, and list
+      anything missing, unasked for, or left undone.
+    agent: developer
+    artifact: verify

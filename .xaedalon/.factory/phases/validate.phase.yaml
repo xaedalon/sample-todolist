@@ -1,0 +1,10 @@
+name: validate
+description: Design tests and validate the implementation works.
+steps:
+  - prompt: >-
+      Design tests for "{{ task.description }}" and run them. What was built is recorded at
+      {{ task.artifacts }}/implement/implement.md. Add the tests to the repository, run them, and
+      record which tests you added, the command that runs them, and their results. If anything
+      fails, say what and why rather than fixing the tests to pass.
+    agent: developer
+    artifact: validate

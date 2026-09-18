@@ -1,0 +1,9 @@
+# This repository's Factory scope.
+#
+# `scope: project` is what makes Factory treat this directory as a project's own
+# definitions rather than somebody's personal ones. Add the repository as a
+# project in Factory and the workflows, phases and agent beside this file are
+# available to its tasks immediately — they resolve through the project scope,
+# which sits above the user scope and the built-ins.
+kind: factory.scope/v1
+scope: project

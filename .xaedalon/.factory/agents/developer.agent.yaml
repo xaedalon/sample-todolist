@@ -1,0 +1,12 @@
+name: developer
+description: Code implementation.
+# No provider on purpose: the sample should run on whichever coding agent you
+# already have. Factory falls back to the configured default, then to the only
+# one installed. Pin it here (`provider: claude`, `copilot` or `codex`) if you
+# have several and want a particular one.
+#
+# `balanced` is a role rather than a model id, so each provider maps it to its
+# own middle model — Sonnet on Claude Code and Copilot, gpt-5-codex on Codex.
+# `strong` and `fast` are the other two.
+model: balanced
+session: task

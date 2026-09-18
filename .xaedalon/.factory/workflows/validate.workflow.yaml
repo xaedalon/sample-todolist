@@ -1,0 +1,7 @@
+name: validate
+description: Design tests and validate it works.
+needs:
+  - implement
+scheduling: sequential
+phases:
+  - validate

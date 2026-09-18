@@ -1,0 +1,6 @@
+name: analysis
+description: Analyse given task.
+steps:
+  - prompt: Analyse given task "{{ task.description }}" from PROJECT.md.
+    agent: developer
+    artifact: analysis
