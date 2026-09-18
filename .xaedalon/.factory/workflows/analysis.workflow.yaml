@@ -1,5 +1,28 @@
+# The first of the five that do the actual work.
+#
+# `needs: environment-create` is what puts the worktree and the environment in
+# front of it — pick any of the five on the board and Factory assembles the
+# whole chain back to `worktree-create`.
+#
+# `requires` is the other half, and it is not the same question: needs decides
+# what belongs in the plan, requires decides whether this may start yet. A
+# hand-assembled task list that left the worktree out would otherwise run an
+# agent in the repository itself, where two tasks overwrite each other. This
+# project has both settings on, so both flags are reachable.
+kind: factory.workflow/v1
 name: analysis
 description: Analyze given task.
-scheduling: sequential
+needs:
+  - environment-create
+conditions:
+  requires:
+    - hasWorktree
+    - hasEnvironment
+# `parallel` is what makes the graph in PROJECT.md worth having, and it is only
+# safe because of the worktree: `sequential` means "do not run this alongside
+# other work", which is the right answer for a project whose tasks share one
+# working copy and the wrong one for a project where each task has its own.
+# Factory still runs at most three tasks at once by default.
+scheduling: parallel
 phases:
   - analysis

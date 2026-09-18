@@ -2,6 +2,6 @@ name: validate
 description: Design tests and validate it works.
 needs:
   - implement
-scheduling: sequential
+scheduling: parallel
 phases:
   - validate

@@ -2,6 +2,6 @@ name: design
 description: Create technical design of the solution.
 needs:
   - analysis
-scheduling: sequential
+scheduling: parallel
 phases:
   - design

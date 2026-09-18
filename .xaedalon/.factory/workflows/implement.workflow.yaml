@@ -2,6 +2,6 @@ name: implement
 description: Implement the expected code.
 needs:
   - design
-scheduling: sequential
+scheduling: parallel
 phases:
   - implement

@@ -1,0 +1,28 @@
+# Give the task somewhere of its own to work.
+#
+# Factory's built-in copy declares `override: required`: where a worktree goes
+# and what it branches from are decisions only the project can make, so it
+# refuses to guess and asks us to write this file. Ours says:
+#
+#   * the worktree goes at `<the project's worktrees root>/<task directory>`,
+#     which Factory hands us as two tokens — never inside the repository,
+#     because a worktree under the working copy shows up in `git status`;
+#   * the branch is `task/<task directory>`, derived rather than typed, so
+#     creating a task on the board needs nothing in the Branch field;
+#   * it always branches from the project's default branch, not from whatever
+#     the main working copy happens to have checked out. Ten tasks branching
+#     from ten different HEADs is the kind of thing nobody notices until a
+#     merge.
+#
+# `provides: hasWorktree` is what the rest of the pipeline waits for. The flag
+# is earned by *declaring* it here, not by being called `worktree-create` —
+# rename this file and nothing breaks.
+kind: factory.workflow/v1
+name: worktree-create
+description: Creates a git worktree for the task, branched from the default branch.
+conditions:
+  requires: []
+  provides:
+    - hasWorktree
+phases:
+  - worktree-add

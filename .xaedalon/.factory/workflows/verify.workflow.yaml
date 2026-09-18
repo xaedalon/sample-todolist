@@ -2,6 +2,6 @@ name: verify
 description: Verify the implementation is what the task expected.
 needs:
   - validate
-scheduling: sequential
+scheduling: parallel
 phases:
   - verify

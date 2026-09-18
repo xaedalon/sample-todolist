@@ -1,0 +1,34 @@
+# Land the work, then clear up after it.
+#
+# `needs: verify` is what makes this the only workflow you have to pick: needs
+# assembles a task's plan from its predecessors, so choosing `merge` pulls in
+# verify, validate, implement, design, analysis, environment-create and
+# worktree-create, in that order, and Factory tells you it did.
+#
+# The three phases are the whole point of the ordering. Nothing is cleared up
+# unless the merge succeeded, because a phase that fails stops the workflow —
+# so a task that cannot be merged keeps its worktree, its branch and everything
+# in them, which is exactly what you want to look at. The two cleanup phases
+# are the same files `environment-delete` and `worktree-delete` use; they are
+# not copies.
+# The one workflow here that is `sequential`. It writes to the default branch
+# and to the repository's own working copy — "it touches the same branch" is
+# exactly what that lane is for — so Factory runs at most one merge at a time
+# whatever else is in flight. The retry inside the phase is then a second line
+# of defence rather than the first.
+kind: factory.workflow/v1
+name: merge
+description: Merges the task's branch into the default branch, then removes its environment and worktree.
+needs:
+  - verify
+scheduling: sequential
+conditions:
+  requires:
+    - hasWorktree
+  clears:
+    - hasEnvironment
+    - hasWorktree
+phases:
+  - merge-integrate
+  - environment-teardown
+  - worktree-remove

@@ -1,0 +1,104 @@
+kind: factory.phase/v1
+name: merge-integrate
+description: Commit the task's work, catch up with the default branch, and fast-forward it.
+# The one gate in the pipeline, and an authorisation gate rather than a review
+# one: `before` means the task parks at `awaiting_approval` and this phase does
+# not run until somebody approves it. By then `verify` has written its verdict,
+# so the evidence is on screen when you decide — which is the moment to check
+# the task's "done when" list in PROJECT.md.
+#
+# Delete this line and the whole pipeline runs end to end with nobody in it.
+approval: before
+steps:
+  # 1. Commit whatever the task produced.
+  #
+  # Nothing in Factory commits for you: the agents wrote files in the worktree
+  # and left them there. The worktree is removed with `--force` two phases from
+  # now, so anything still uncommitted at that point is gone — which makes this
+  # step the thing that turns a run into work somebody keeps.
+  - run: |
+      set -e
+      if [ -z "$(git status --porcelain)" ]; then
+        echo "working tree already clean"
+        exit 0
+      fi
+      # The task's name goes through a quoted heredoc rather than straight into
+      # the command line. A step is a shell script and a task name is somebody
+      # else's text; the two should never meet unquoted.
+      name=$(cat <<'TASK_NAME'
+      {{ task.name }}
+      TASK_NAME
+      )
+      git add -A
+      git commit -q -m "$name" -m "Factory task {{ task.uuid }}"
+      echo "committed:"
+      git --no-pager log --oneline -1
+
+  # 2. Land it — under a lock, and in this order for a reason.
+  #
+  # The merge that can conflict happens **in the worktree**, where the task's
+  # own changes are and where a conflict can be read; the merge into the default
+  # branch is then a fast-forward, which either applies cleanly or does nothing
+  # at all. That is what lets ten of these run at once.
+  #
+  # The lock is not belt-and-braces. `merge` is marked `scheduling: sequential`,
+  # which Factory honours when it admits a *queued* task — but a task resumed
+  # from an approval gate is handed straight to the engine without the lane
+  # being consulted (`packages/engine/src/scheduler.ts`, the "Resumed first"
+  # loop). Approve two tasks in the same second and both merges run together;
+  # measured, not guessed — it left the repository with a staged deletion of a
+  # file that had merged perfectly well. A workflow that writes to shared state
+  # should not depend on a scheduling hint to be alone, so this one takes an
+  # actual lock. `mkdir` is the atomic primitive available everywhere, unlike
+  # `flock`, which macOS does not ship.
+  - run: |
+      set -e
+      repo="{{ project.path }}"
+      main="{{ project.branch }}"
+      branch="task/{{ task.directory }}"
+      [ -n "$repo" ] || { echo "no project path" >&2; exit 1; }
+
+      if [ "$(git rev-list --count "$main..$branch")" = "0" ]; then
+        echo "Nothing to merge: $branch has no commits that $main does not already have."
+        echo "If that is a surprise, the work was never committed, or everything it"
+        echo "wrote is covered by .gitignore."
+        exit 0
+      fi
+
+      lock="$repo/.git/factory-merge.lock"
+      held=""
+      for attempt in $(seq 1 120); do
+        if mkdir "$lock" 2>/dev/null; then held=yes; break; fi
+        [ "$attempt" = 1 ] && echo "another task is merging — waiting for it"
+        sleep 1
+      done
+      if [ -z "$held" ]; then
+        echo "Two minutes waiting for $lock." >&2
+        echo "If no merge is running, a cancelled one left it behind: rmdir that directory." >&2
+        exit 1
+      fi
+      trap 'rmdir "$lock" 2>/dev/null || true' EXIT INT TERM
+
+      on=$(git -C "$repo" rev-parse --abbrev-ref HEAD)
+      if [ "$on" != "$main" ]; then
+        echo "$repo is on \"$on\", not \"$main\", so this cannot be merged into it." >&2
+        echo "  git -C \"$repo\" checkout $main" >&2
+        exit 1
+      fi
+      if [ -n "$(git -C "$repo" status --porcelain)" ]; then
+        echo "$repo has uncommitted changes, so merging into $main would not be safe:" >&2
+        git -C "$repo" --no-pager status --short >&2
+        exit 1
+      fi
+
+      if ! git merge --no-edit "$main"; then
+        git merge --abort || true
+        echo "\"$main\" does not merge cleanly into $branch." >&2
+        echo "Resolve it in the worktree, commit, and run this workflow again:" >&2
+        echo "  cd {{ project.worktrees }}/{{ task.directory }} && git merge $main" >&2
+        exit 1
+      fi
+
+      git -C "$repo" merge --ff-only "$branch"
+      echo "merged $branch into $main:"
+      git -C "$repo" --no-pager log --oneline -1

@@ -1,0 +1,11 @@
+# The environment installs into the worktree, and the merge commits everything
+# the task produced. Without this, the first task to add a dependency would
+# commit a few thousand files.
+node_modules/
+
+# Whatever a build step produces. There is no build today; an agent that adds
+# one should not have to remember this file.
+dist/
+build/
+
+.DS_Store

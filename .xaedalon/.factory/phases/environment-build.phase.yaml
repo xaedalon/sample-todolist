@@ -1,0 +1,34 @@
+kind: factory.phase/v1
+name: environment-build
+description: Check what the pipeline needs, then install this worktree's dependencies.
+steps:
+  # Fails here or not at all. The merge at the end of the pipeline makes a
+  # commit, and a commit needs a git identity — finding that out after five
+  # agent phases have run is finding it out in the worst possible place.
+  - run: |
+      if [ -z "$(git config user.email)" ] || [ -z "$(git config user.name)" ]; then
+        echo "git has no identity configured, so the merge at the end of this" >&2
+        echo "pipeline could not make a commit. Set one:" >&2
+        echo "  git config --global user.name  \"Your Name\"" >&2
+        echo "  git config --global user.email \"you@example.com\"" >&2
+        exit 1
+      fi
+      echo "git identity: $(git config user.name) <$(git config user.email)>"
+      echo "node: $(node --version 2>/dev/null || echo 'not on PATH')"
+
+  # Nothing to install until an agent adds a manifest, and saying so is better
+  # than a red step. `npm ci` when there is a lockfile, because it is the one
+  # that produces the same tree twice; `npm install` when there is not.
+  - run: |
+      set -e
+      if [ -f package-lock.json ]; then
+        echo "installing from package-lock.json"
+        npm ci
+      elif [ -f package.json ]; then
+        echo "no lockfile yet — installing from package.json"
+        npm install
+      else
+        echo "no package.json in this worktree, so there is nothing to install."
+        echo "The app is plain HTML, CSS and JavaScript; this phase starts doing"
+        echo "something the moment a task adds a manifest."
+      fi

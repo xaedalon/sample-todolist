@@ -1,0 +1,15 @@
+# Take the environment away.
+#
+# Like `worktree-delete`, deliberately outside the `needs` chain so it can be
+# run on its own — to reclaim a few hundred megabytes from a task that is
+# parked, without throwing away the worktree or the branch. The happy path
+# reaches the same phase through `merge`.
+kind: factory.workflow/v1
+name: environment-delete
+description: Removes what the environment installed in the task's worktree.
+conditions:
+  requires: []
+  clears:
+    - hasEnvironment
+phases:
+  - environment-teardown
