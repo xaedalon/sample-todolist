@@ -16,19 +16,24 @@ steps:
       echo "git identity: $(git config user.name) <$(git config user.email)>"
       echo "node: $(node --version 2>/dev/null || echo 'not on PATH')"
 
-  # Nothing to install until an agent adds a manifest, and saying so is better
-  # than a red step. `npm ci` when there is a lockfile, because it is the one
-  # that produces the same tree twice; `npm install` when there is not.
+  # Nothing to install until a task adds a manifest, and saying so is better
+  # than a red step. The package manager is whichever the repository has
+  # committed a lockfile for — PROJECT.md asks for pnpm, so that is first, and
+  # the frozen/ci variants are the ones that install the tree the lockfile
+  # describes rather than a fresh resolution per worktree.
   - run: |
       set -e
-      if [ -f package-lock.json ]; then
+      if [ -f pnpm-lock.yaml ]; then
+        echo "installing from pnpm-lock.yaml"
+        corepack enable pnpm 2>/dev/null || true
+        pnpm install --frozen-lockfile
+      elif [ -f package-lock.json ]; then
         echo "installing from package-lock.json"
         npm ci
       elif [ -f package.json ]; then
-        echo "no lockfile yet — installing from package.json"
-        npm install
+        echo "a manifest with no lockfile — installing and writing one"
+        if command -v pnpm >/dev/null 2>&1; then pnpm install; else npm install; fi
       else
         echo "no package.json in this worktree, so there is nothing to install."
-        echo "The app is plain HTML, CSS and JavaScript; this phase starts doing"
-        echo "something the moment a task adds a manifest."
+        echo "The first task scaffolds one; from then on this phase does the work."
       fi
