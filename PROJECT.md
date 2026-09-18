@@ -13,6 +13,10 @@ One page, no backend. You can add a todo, tick it off, rename it, delete it, fil
 and clear the ones you have finished. It remembers everything across a reload. It works with a
 keyboard alone.
 
+And it looks like something somebody chose: one palette, one type pairing, one set of icons, in both
+light and dark. Not decorated — *deliberate*. An agent that produces working behaviour on an
+unstyled page has done half the task.
+
 ## Stack
 
 - **TypeScript**, strict, no `any`.
@@ -20,6 +24,12 @@ keyboard alone.
 - **No UI framework.** Plain DOM. The app is small enough that a framework would be the largest
   thing in it, and the point is to read the code and see what it does.
 - **No backend.** State lives in `localStorage`.
+- **Three files, three jobs.** `index.html` is structure, `src/theme.css` and `src/app.css` are
+  appearance, the TypeScript modules are behaviour. No `style=` attributes, no colour values outside
+  the stylesheets, and no markup built by string concatenation.
+- **Nothing the page loads comes from the internet.** No CSS framework, no icon font, no CDN, no
+  Google Fonts request. Everything ships from the repository, so the app works offline and on a
+  first load nobody has warmed.
 
 ## Conventions
 
@@ -29,6 +39,31 @@ keyboard alone.
   tested without one. Rendering reads state and writes elements, and nothing else.
 - Small commits, present tense, explaining why rather than what.
 - No dependencies beyond the toolchain without saying why in the commit message.
+
+## Look and feel
+
+This is a contract, not a task. Every task that touches the page obeys it, because a theme applied
+at the end is how an app ends up with the same colour written in nine places.
+
+**Colour.** One palette, defined once in `src/theme.css` as custom properties on `:root`, and
+redefined for dark under `@media (prefers-color-scheme: dark)`. Nothing outside that file contains a
+colour value. The palette is small on purpose: a page background, a raised surface, a text colour
+and a muted one, one accent, and one danger colour for destructive controls. Text on every surface
+meets WCAG AA (4.5:1 for body text) in both schemes — a theme that is only legible in one is half a
+theme.
+
+**Type.** One pairing, two roles: a heading face and a body face, each declared once as a token with
+a real fallback stack ending in `system-ui`. Self-hosted if a webfont is used — a `woff2` in the
+repository, `font-display: swap` — so the page never waits on a third party. Sizes come from tokens
+too, and there are few of them: nobody needs eleven sizes for a todo list.
+
+**Icons.** Inline SVG, from one set, in one file (`src/icons.ts` exporting SVG strings or nodes).
+Tick, delete, edit, and whatever the filters need. No icon font, no sprite fetched over the network.
+`currentColor` for the fill, so an icon inherits the colour of whatever it sits in. Every icon-only
+control carries an accessible name — an icon is not a label.
+
+**Spacing and shape.** A spacing scale and one border radius, both tokens. Two values, used
+everywhere, beat twenty guessed one at a time.
 
 ## The ten tasks
 
@@ -59,6 +94,10 @@ A repository someone can clone and run.
 - `pnpm build` produces `dist/`.
 - TypeScript is strict: `strict`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`.
 - `.gitignore` covers `node_modules`, `dist` and editor droppings.
+- `index.html` links one stylesheet; `src/theme.css` holds the tokens from **Look and feel** and
+  nothing else; `src/app.css` holds the rules that use them.
+- That first page already reads its background, text colour and font from the tokens, so no later
+  task has to retrofit a theme onto markup that hardcoded one.
 
 ### 2. The todo model
 
@@ -89,6 +128,8 @@ near them.
 - An empty list says something useful rather than showing nothing at all.
 - Rendering the same list twice produces the same DOM, and rendering is the only thing that writes
   to the page.
+- Every colour, size, space and radius it draws with comes from a token: searching the source for a
+  hex value outside `src/theme.css` finds nothing.
 
 ### 5. Add a todo
 
@@ -104,6 +145,8 @@ near them.
 - Each row has a checkbox that toggles it, and a control that deletes it.
 - Both survive a reload.
 - Deleting takes effect immediately; there is no confirmation dialogue for a single todo.
+- The delete control is an icon from `src/icons.ts`, drawn in `currentColor` and using the danger
+  token on hover, with an accessible name that names the todo rather than saying "delete".
 
 ### 7. Rename a todo in place
 
@@ -135,6 +178,9 @@ near them.
 - Focus is visible on every control — a real outline, not a removed one.
 - Deleting a todo moves focus somewhere sensible rather than to the top of the page.
 - Each control has an accessible name; checkboxes are labelled by their todo's title.
+- The focus ring is a token, visible against both the page and the raised surface, in light and dark.
+- The app is legible with `prefers-reduced-motion` and at 200% browser zoom — a theme that breaks
+  when text grows was measured at one size only.
 - `README.md` says what the app is and how to run it.
 
 ## Running it
