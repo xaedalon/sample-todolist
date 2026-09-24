@@ -1,5 +1,9 @@
 # Directives
 
+## SAMPLE PROJECT
+
+This is a sample project in order to learn how Xaedalon Factory works, do not commit code, push code, create issues or interact outside of this repository unless explicitly asked for it. 
+
 ## Best Guess
 
 Give me your best guess and reasons, whenever there is a decision to make.

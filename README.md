@@ -1,5 +1,19 @@
 # sample-todolist
 
+A small todo web app: add, tick, rename, delete todos. Remembers everything across reloads. Works with keyboard alone.
+
+## The app
+
+```bash
+pnpm install
+pnpm dev      # http://localhost:5180
+pnpm test
+pnpm build
+pnpm check    # types, tests and build
+```
+
+---
+
 The sample project for [Xaedalon Factory](https://github.com/xaedalon/factory-community): a small
 todo web app, specified as ten tasks with a dependency graph, built by coding agents — several at
 once, each in a worktree of its own, each merged back when somebody approves it.
