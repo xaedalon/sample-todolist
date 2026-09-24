@@ -1,9 +1,12 @@
-# This repository's Factory scope.
+# Factory definitions for this project.
 #
-# `scope: project` is what makes Factory treat this directory as a project's own
-# definitions rather than somebody's personal ones. Add the repository as a
-# project in Factory and the workflows, phases and agent beside this file are
-# available to its tasks immediately — they resolve through the project scope,
-# which sits above the user scope and the built-ins.
+# Shared with the repository: ../.gitignore ignores only what runs produce
+# (task artifacts, state, trash), so anyone who clones it gets these phases,
+# workflows and agents with no separate install step.
+#
+# Whatever is here takes precedence over ~/.xaedalon/.factory.
 kind: factory.scope/v1
 scope: project
+
+# plugins:
+#   - ./plugins/my-plugin.mjs

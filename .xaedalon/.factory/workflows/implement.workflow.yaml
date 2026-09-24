@@ -1,11 +1,6 @@
+kind: factory.workflow/v1
 name: implement
-description: Implement the expected code.
-needs:
-  - design
-scheduling: parallel
+description: Task implementation
+scheduling: sequential
 phases:
-  # The guard first, in every one of the five, because the scheduler's own
-  # flag check can be routed around by unticking worktree-create. One file,
-  # five references — see phases/in-my-worktree.phase.yaml.
-  - in-my-worktree
   - implement

@@ -1,6 +1,6 @@
 name: analysis
-description: Analyse given task.
+description: Analyse Task.
 steps:
-  - prompt: Analyse given task "{{ task.description }}" from PROJECT.md.
-    agent: developer
+  - prompt: 'Analyse Task: "{{ task.name }}" "{{ task.description }}"'
+    agent: developer-haiku
     artifact: analysis

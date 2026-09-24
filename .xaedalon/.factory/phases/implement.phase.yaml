@@ -1,10 +1,6 @@
 name: implement
-description: Implement the expected code.
+description: Implement Task.
 steps:
-  - prompt: >-
-      Implement "{{ task.description }}" in this repository, following the design at
-      {{ task.artifacts }}/design/design.md. The code itself belongs in the repository — the
-      artifact is your record of it, so list what you changed, in which files, and anything you
-      decided differently from the design and why.
-    agent: developer
+  - prompt: 'Implement Task: "{{ task.name }}" "{{ task.description }}"'
+    agent: developer-haiku
     artifact: implement

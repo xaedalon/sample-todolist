@@ -1,1 +1,25 @@
+# Factory keeps its files here: the workflows, phases and agents you write,
+# under .factory/, and whatever its runs produce beside them.
+#
+# The * on the last line hides all of it from git — this file included — so
+# Factory has added nothing to your git status. A repository is yours, and a
+# tool you are trying out has no business in your next commit.
+#
+# To share these definitions with everyone who clones the repository,
+# replace that * with the three lines below and commit .xaedalon. They
+# ignore only what a run produced: a task's artifacts, Factory's database
+# if it lives in this repository, and the backups a bundle import takes.
+#
+#   .factory/tasks/
+#   .factory/state/
+#   .factory/.trash/
+#
+# Deleting this file does the same thing, and Factory writes the smaller
+# version back the next time one of its runs produces an artifact.
+#
+# None of this untracks anything already committed: git ignores only what it
+# is not already tracking. "git status --ignored" lists what is here, and
+# "git check-ignore -v <path>" says which line hid a given file.
 .factory/tasks/
+.factory/state/
+.factory/.trash/
