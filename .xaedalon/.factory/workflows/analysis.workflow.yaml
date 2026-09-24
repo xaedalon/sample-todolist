@@ -1,5 +1,0 @@
-name: analysis
-description: Task analysis
-scheduling: sequential
-phases:
-  - analysis

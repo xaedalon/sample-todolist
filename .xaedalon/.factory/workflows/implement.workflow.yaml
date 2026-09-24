@@ -1,6 +1,0 @@
-kind: factory.workflow/v1
-name: implement
-description: Task implementation
-scheduling: sequential
-phases:
-  - implement

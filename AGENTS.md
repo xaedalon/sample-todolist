@@ -6,19 +6,21 @@ This is a sample project in order to learn how Xaedalon Factory works, do not co
 
 ## What this repository versions
 
-This repository is a **scaffold**: the specification and the Factory pipeline that a Factory
-instance uses to build the app. It is not the app. Only these files are versioned:
+This repository is a **scaffold**: the specification a Factory instance uses to build the app. It
+is neither the app nor the pipeline, because building both is the exercise. Only these files are
+versioned:
 
 | Path | What it is |
 |---|---|
 | `AGENTS.md`, `CLAUDE.md` | directives for agents |
 | `PROJECT.md` | the specification: the source of truth for the build |
-| `README.md` | what the sample is and how to run it with Factory |
-| `.gitignore` | keeps build output and dependencies out |
-| `.xaedalon/` | the Factory pipeline: `config.yaml`, `phases/`, `workflows/`, `agents/`, and `.xaedalon/.gitignore`. Not `.factory/tasks/`, `.factory/state/` or `.factory/.trash/`, which that file already ignores |
+| `README.md` | what the sample is, and how to build the pipeline and run it with Factory |
+| `.gitignore` | keeps the pipeline, build output and dependencies out |
 
-Everything a development run produces stays **unversioned**, even when it lives in this directory:
+Everything else stays **unversioned**, even when it lives in this directory:
 
+- **The Factory pipeline:** `.xaedalon/` (phases, workflows, agents and task artifacts). Each person
+  builds their own; `.gitignore` ignores it.
 - **The app itself:** `src/`, `index.html`, `package.json`, `pnpm-lock.yaml`, `tsconfig.json`,
   `vite.config.ts`, and any other code, tests or config a task creates.
 - **Build output and dependencies:** `node_modules/`, `dist/`, `coverage/` (already in `.gitignore`).

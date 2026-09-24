@@ -1,6 +1,0 @@
-name: verify
-description: Verify Task.
-steps:
-  - prompt: 'Verify Task: "{{ task.name }}" "{{ task.description }}"'
-    agent: developer-haiku
-    artifact: verify

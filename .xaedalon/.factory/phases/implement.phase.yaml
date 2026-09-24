@@ -1,6 +1,0 @@
-name: implement
-description: Implement Task.
-steps:
-  - prompt: 'Implement Task: "{{ task.name }}" "{{ task.description }}"'
-    agent: developer-haiku
-    artifact: implement

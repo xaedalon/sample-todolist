@@ -1,6 +1,0 @@
-name: design
-description: Design Task.
-steps:
-  - prompt: 'Design Task: "{{ task.name }}" "{{ task.description }}"'
-    agent: developer-haiku
-    artifact: design

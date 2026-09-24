@@ -13,3 +13,6 @@ build/
 .idea/
 *.log
 coverage/
+
+# The Factory pipeline is part of the exercise: each person builds their own.
+.xaedalon/
