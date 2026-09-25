@@ -1,16 +1,16 @@
 # Todolist
 
-A small todo web app, built one task at a time by coding agents under
-[Xaedalon Factory](https://github.com/xaedalon/factory-community). It is deliberately ordinary: everybody knows what a todo list should
-do, which makes it easy to tell whether an agent did the job.
+A small todo web app, built one task at a time by coding agents. It is deliberately ordinary:
+everybody knows what a todo list should do, which makes it easy to tell whether an agent did the
+job.
 
-This file is the source of truth. Each task below is one Factory task — the name is what to type
-into **New task**, and "done when" is what a reviewer checks at the approval gate.
+This file is the source of truth. Each task below is one unit of work for an agent, and "Done
+when" is what a reviewer checks before accepting it.
 
 It is written so that a small model can do any one task without guessing: every decision that two
 tasks have to agree on — file names, function signatures, class names, token values, markup — is
 made here, once, before anyone starts. If a task seems to need a decision this file does not make,
-make the smallest one that fits and write it down in the task's artifact.
+make the smallest one that fits and write it down in your report on the task.
 
 ## How to work a task
 
@@ -35,7 +35,7 @@ Things never to do, in any task:
 
 - Do not add a dependency that is not listed in **Stack**.
 - Do not change a token value in `src/theme.css`, a signature in **Architecture**, or a class name
-  in **The page**. Other tasks rely on them. If one is wrong, say so in the artifact.
+  in **The page**. Other tasks rely on them. If one is wrong, say so in your report.
 - Do not delete or weaken another task's test to make yours pass. A test that has to change because
   the behaviour it describes changed on purpose is fine; say which and why.
 - Do not build markup from strings (`innerHTML`, `insertAdjacentHTML`, template literals of HTML)
@@ -1321,9 +1321,9 @@ finishes the polish.
   fixed `height` on text.
 - **Reduced motion.** The token already drops `--duration` to `0ms`. Make sure every `transition`
   in `app.css` uses `var(--duration)` and nothing else.
-- **README.** Add a short **The app** section at the top of `README.md`: one sentence saying what
-  it is, then `pnpm install`, `pnpm dev`, `pnpm test`, `pnpm build`. Keep everything the README
-  already says about Factory below it.
+- **README.** Make sure `README.md` starts with a short **The app** section: one sentence saying
+  what it is, then `pnpm install`, `pnpm dev`, `pnpm test`, `pnpm build`. Add it if it is missing,
+  and keep everything else the README says below it.
 
 **Scenarios**
 

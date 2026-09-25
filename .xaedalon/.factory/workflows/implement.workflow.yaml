@@ -1,0 +1,14 @@
+kind: factory.workflow/v1
+name: implement
+description: Do the work, and make it build.
+needs:
+  - design
+reliability:
+  contributes:
+    - implementation
+  expected_evidence:
+    - implementation_exists
+    - build_success
+    - targeted_tests
+phases:
+  - implement

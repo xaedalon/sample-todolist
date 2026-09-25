@@ -1,0 +1,13 @@
+kind: factory.workflow/v1
+name: analysis
+description: Work out what is actually being asked, and what would prove it.
+reliability:
+  contributes:
+    - understanding
+    - precedent
+  expected_evidence:
+    - requirements_understood
+    - constraints_identified
+    - precedent_examined
+phases:
+  - analyse

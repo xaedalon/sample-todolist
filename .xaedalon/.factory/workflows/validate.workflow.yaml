@@ -1,0 +1,13 @@
+kind: factory.workflow/v1
+name: validate
+description: Run what the project already runs, and believe the result.
+needs:
+  - implement
+reliability:
+  contributes:
+    - regressionSafety
+  expected_evidence:
+    - integration_checks
+phases:
+  - validate
+  - project-check

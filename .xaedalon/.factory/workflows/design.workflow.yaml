@@ -1,0 +1,13 @@
+kind: factory.workflow/v1
+name: design
+description: Decide how, and say what it would break.
+needs:
+  - analysis
+reliability:
+  contributes:
+    - design
+  expected_evidence:
+    - technical_approach
+    - compatibility_considered
+phases:
+  - design

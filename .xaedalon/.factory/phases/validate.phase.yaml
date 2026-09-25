@@ -1,0 +1,20 @@
+kind: factory.phase/v1
+name: validate
+description: Check the work against what the project already expects.
+steps:
+  - prompt: |
+      Check the work in this repository against
+      {{ task.artifacts }}/design/design.md.
+
+      Run whatever this project uses to check itself and paste the output.
+      Look for what the change might have broken rather than for what it was
+      meant to do.
+
+      Report what you found as findings, not as a verdict. "The checkout
+      redirect behaves differently" is useful; "looks good" is not. If you
+      found nothing, say what you looked at, so somebody can judge whether
+      that was enough.
+    artifact: validation
+    model: balanced
+    session: task
+    agent: developer-haiku

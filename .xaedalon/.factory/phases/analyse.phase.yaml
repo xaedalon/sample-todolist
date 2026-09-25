@@ -1,0 +1,35 @@
+kind: factory.phase/v1
+name: analyse
+description: Understand the problem before anybody proposes a solution.
+steps:
+  - prompt: "Work out what \"{{ task.name }}\" actually requires.
+
+
+      {{ task.description }}
+
+
+      Write down, in this order:
+
+
+      - what is being asked for, in your words;
+
+      - the acceptance criteria — how anybody would know it was done;
+
+      - the constraints you found in the code, not the ones you assumed;
+
+      - anything already in this repository that solves something similar,
+
+      \  with file paths;
+
+      - every question you could not answer from the code.
+
+
+      That last list is the important one. Say what you do not know rather
+
+      than filling it in — an unknown you name becomes something somebody
+
+      can answer, and an unknown you paper over becomes a defect.\n"
+    artifact: analysis
+    model: strong
+    session: task
+    agent: developer-haiku

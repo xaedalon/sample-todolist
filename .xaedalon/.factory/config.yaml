@@ -1,0 +1,13 @@
+# Factory definitions for this project.
+#
+# Yours alone for now: ../.gitignore hides this whole directory from git,
+# so nothing here is in your next commit. That file says how to share these
+# workflows with your team when you want to — and once you do, anyone who
+# clones the repository gets them with no separate install step.
+#
+# Whatever is here takes precedence over ~/.xaedalon/.factory.
+kind: factory.scope/v1
+scope: project
+
+# plugins:
+#   - ./plugins/my-plugin.mjs

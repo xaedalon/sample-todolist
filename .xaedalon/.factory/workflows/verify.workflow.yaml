@@ -1,0 +1,13 @@
+kind: factory.workflow/v1
+name: verify
+description: Look again, with fresh eyes, against what was asked for.
+needs:
+  - validate
+reliability:
+  contributes:
+    - verification
+  expected_evidence:
+    - acceptance_criteria
+    - independent_review
+phases:
+  - verify

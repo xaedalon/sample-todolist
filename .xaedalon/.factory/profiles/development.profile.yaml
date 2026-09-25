@@ -1,0 +1,76 @@
+# What an agent needs to work in this repository, beyond the Default profile.
+#
+# Measured against Claude Code 2.1.281 on 2026-09-24, in a throwaway repository,
+# with the Default profile's own flags. Every line below is a measurement rather
+# than a guess.
+#
+# ALREADY ALLOWED — deliberately NOT listed here
+#
+#   git status, git diff, git log, cat, head, find, which
+#
+#   Read-only commands are auto-approved whatever an allow-list says. Listing
+#   them would change nothing and would leave whoever reads this file believing
+#   the profile bought them.
+#
+#   `git -C <path>` is refused whatever this file says — including `git -C .`
+#   pointing at the working directory. `--restricted` reads the flag itself as
+#   leaving confinement. An agent should run `git status`, standing where it
+#   already is. No profile fixes that, and it is the boundary working.
+#
+# WHAT THIS BUYS — each one measured refused under Default
+#
+#   git add, git commit    An agent could not commit its own work. That is the
+#                          one that matters: a commit is a recovery point, and a
+#                          task whose agent cannot make one has no way back.
+#   git checkout, switch,
+#   restore, stash         Branch and working-tree moves, same class.
+#   git merge, rebase, tag Local history, no remote involved.
+#   lsof                   Checking whether the dev server is already on a port.
+#                          The thing T1 was refused.
+#
+# WHAT IT DOES NOT BUY
+#
+#   The workspace boundary is untouched. A write outside this repository is
+#   still refused, credentials are still withheld, and the granted directories
+#   are still the only exceptions. This profile widens which commands may run,
+#   never where they may write.
+#
+# DENIED ON PURPOSE — these cross the local boundary or change the machine
+#
+#   git push      leaves this machine. Measured refused with the scoped list,
+#                 and kept refused here so it stays that way if `git` is ever
+#                 widened.
+#   git config    edits the repository's or the machine's configuration.
+#   git remote    repoints where push would go.
+#   git clean     deletes untracked files, which includes work not yet added.
+#
+# pnpm is already on the Default list, so this project's `pnpm check` needs
+# nothing from here.
+#
+# docs/security/profiles.md in factory-community explains the format.
+name: development
+description: Default, plus the git an agent needs to commit its own work.
+commands:
+  - git add
+  - git commit
+  - git checkout
+  - git switch
+  - git restore
+  - git stash
+  - git merge
+  - git rebase
+  - git tag
+  - lsof
+  - node
+  - curl
+  - awk
+  - grep
+  - find
+  - kill
+  - echo
+  - sed
+deny_commands:
+  - git push
+  - git config
+  - git remote
+  - git clean

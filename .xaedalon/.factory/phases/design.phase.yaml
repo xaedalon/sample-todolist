@@ -1,0 +1,30 @@
+kind: factory.phase/v1
+name: design
+description: Decide the approach, and be specific about what it touches.
+steps:
+  - prompt: "Read {{ task.artifacts }}/analysis/analysis.md and decide how to do it.
+
+
+      Write down:
+
+
+      - the approach, and why it fits what is already here;
+
+      - every file you expect to change;
+
+      - what could break, and what would tell you it had;
+
+      - anything about compatibility — versions, interfaces, data — that you
+
+      \  checked rather than assumed;
+
+      - what you would need to see to believe this works.
+
+
+      If the analysis left a question open and you cannot answer it from the
+
+      code, say so here too rather than choosing quietly.\n"
+    artifact: design
+    model: strong
+    session: task
+    agent: developer-haiku

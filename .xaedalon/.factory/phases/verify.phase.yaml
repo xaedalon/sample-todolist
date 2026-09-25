@@ -1,0 +1,18 @@
+kind: factory.phase/v1
+name: verify
+description: An independent look, against what was asked rather than what was built.
+steps:
+  - prompt: |
+      Read {{ task.artifacts }}/analysis/analysis.md for what was asked, then
+      look at what is in the repository now.
+
+      Go through the acceptance criteria one at a time and say, for each,
+      what you checked and what you saw. Then say what you would still not
+      be willing to promise.
+
+      You have not seen the design or the implementation notes and that is
+      deliberate. Judge the work, not the account of it.
+    artifact: verification
+    model: strong
+    session: phase
+    agent: developer-haiku

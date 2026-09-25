@@ -1,0 +1,9 @@
+# Factory keeps its files here. The definitions under .factory/ (config,
+# workflows, phases, agents, profiles) are versioned: they are one pipeline that
+# runs this sample, for anyone who clones it to use, change or replace.
+#
+# What a run produces is not versioned: a task's artifacts, Factory's database
+# if it lives in this repository, and the backups a bundle import takes.
+.factory/tasks/
+.factory/state/
+.factory/.trash/

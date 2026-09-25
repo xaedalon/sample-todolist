@@ -1,6 +1,5 @@
-# The environment installs into the worktree, and the merge commits everything
-# the task produced. Without this, the first task to add a dependency would
-# commit a few thousand files.
+# Dependencies. Without this, the first task to add one would commit a few
+# thousand files.
 node_modules/
 
 # Whatever a build step produces. There is no build today; an agent that adds
@@ -14,5 +13,5 @@ build/
 *.log
 coverage/
 
-# The Factory pipeline is part of the exercise: each person builds their own.
-.xaedalon/
+# The Factory pipeline under .xaedalon/ is versioned; .xaedalon/.gitignore keeps
+# its run output out. Add whatever another tool writes to the checkout.

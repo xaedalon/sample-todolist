@@ -1,0 +1,19 @@
+kind: factory.phase/v1
+name: implement
+description: Do the work.
+steps:
+  - prompt: |
+      Carry out {{ task.artifacts }}/design/design.md.
+
+      Then write down what you actually did, which is rarely quite what was
+      planned: the files you changed, the commands you ran and what they
+      printed, and anything you could not do.
+
+      **Paste the output of what you ran.** A claim that the tests pass is
+      not evidence that the tests pass. If a command was refused or you
+      could not run it, say that instead — a reported success that did not
+      happen is worse than a reported failure that did.
+    artifact: implementation
+    model: strong
+    session: task
+    agent: developer-haiku

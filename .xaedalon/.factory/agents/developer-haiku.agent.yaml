@@ -1,0 +1,6 @@
+name: developer-haiku
+description: Code implementation.
+provider: claude
+model: haiku
+effort: medium
+session: task
